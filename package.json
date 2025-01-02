@@ -1,0 +1,30 @@
+{
+  "name": "ifc-browser",
+  "version": "1.0.0",
+  "description": "IFC 3D Model Viewer using HTMX",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "ifc",
+    "viewer",
+    "3d",
+    "htmx"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^6.0.7"
+  },
+  "dependencies": {
+    "@thatopen/components": "^2.4.3",
+    "@thatopen/fragments": "^2.4.0",
+    "@thatopen/ui": "^2.4.1",
+    "htmx.org": "^2.0.4",
+    "three": "^0.160.1",
+    "web-ifc": "^0.0.66"
+  }
+}
