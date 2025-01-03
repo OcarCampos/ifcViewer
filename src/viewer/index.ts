@@ -14,18 +14,6 @@ import * as CUI from "@thatopen/ui-obc";
 import { FragmentsGroup } from "@thatopen/fragments";
 
 /* 
-  There is to define a function to load the IFC programmatically. 
-*/
-async function loadIfc() {
-  const file = await fetch("./src/viewer/5081-1410.ifc");
-  const data = await file.arrayBuffer();
-  const buffer = new Uint8Array(data);
-  const model = await fragmentIfcLoader.load(buffer);
-  //model.name = "example";
-  world.scene.three.add(model);
-}
-
-/* 
   To save the fragments so that you don't need to open the IFC file 
   each time. Instead, the next time you can load the fragments directly. 
   Defining a function to export and download fragments:
@@ -74,7 +62,7 @@ async function importFragments() {
     const fragmentsManager = components.get(OBC.FragmentsManager);
     fragmentsManager.load(fragmentBinary);
   });
-        
+
   // when the user selects a file, read the file as text
   input.addEventListener('change', () => {
     const filesList = input.files;
@@ -141,13 +129,115 @@ async function processModel(model: FragmentsGroup) {
 /*
   Function to show the properrties of the elements when clicked.
 */
-async function onShowProperties() {
-  if (!fragmentModel) {
+async function showProperties() {
+  // Making sure fragmentModel exists
+  if (!fragmentModel){
     return;
   }
-  const properties = await fragmentModel.getLocalProperties();
-  console.log(properties);
+  // Highliger selection
+  const highlighter = components.get(OBCF.Highlighter);
+  const selection = highlighter.selection.select;
+  const indexer = components.get(OBC.IfcRelationsIndexer);
+  // If no object is selected
+  if (Object.keys(selection).length === 0) {
+    return;
+  }
+
+  // Iterate over the selected objects
+  for (const fragmentID in selection) {
+    const expressIDs = selection[fragmentID];
+    for (const id of expressIDs) {
+        // IsDefinedBy is one relation type, but there are more, must explore the others. Read IFC documentation.
+        // Also there is a better way to provide the model to the indexer based on the selection made by the highlighter
+        // First the fragment manager components contains all the list of all the loaded fragments
+        // Knowing the fragment ID you can get the corresponding fragment instance
+        // Knowing the fragment instance you can get its group properties which it is the actual IFC model
+        // By doing this it is possible to work with multiple models.
+        // TIP: fragments.list.get(fragmentID)
+        const psets = indexer.getEntityRelations(fragmentModel, id, "IsDefinedBy");
+        //console.log(psets);
+        if (psets){
+            for (const expressId of psets){
+                const prop = await fragmentModel.getProperties(expressId);
+                console.log(prop);
+            }
+        }
+    }
+  }
 }
+
+/*
+  Function to toggle the visibility of the elements when clicked.
+*/
+function toggleVisibility() {
+  // Highlighting the selected element
+  const highlighter = components.get(OBCF.Highlighter);
+  const fragments = components.get(OBC.FragmentsManager);
+  const selection = highlighter.selection.select;
+  // If no object is selected
+  if (Object.keys(selection).length === 0) {
+    return;
+  }
+
+  // Iterate over the selected objects and toggle their visibility
+  for (const fragmentID in selection) {
+    const fragment = fragments.list.get(fragmentID);
+    const expressIDs = selection[fragmentID];
+    for (const id of expressIDs){
+      if(!fragment) { continue; }
+      const isHidden = fragment.hiddenItems.has(id);
+      if (isHidden) {
+        fragment.setVisibility(true,[id]);
+      } else {
+        fragment.setVisibility(false,[id]);
+      }
+    }
+  }
+}
+
+/*
+  Function to isolate the selection of an element
+*/
+function isolateSelection() {
+  const highlighter = components.get(OBCF.Highlighter);
+  const hider = components.get(OBC.Hider);
+  const selection = highlighter.selection.select;
+  hider.isolate(selection);
+}
+
+/*
+  Function to show all elements
+*/
+function showAll() {
+  const hider = components.get(OBC.Hider);
+  hider.set(true);
+}
+
+/*
+function to open the classifier table
+*/
+function classifier() {
+  if (!floatingGrid) {
+    return;
+  }
+  // Opening and closing the classifier panel depending on current status
+  if (floatingGrid.layout !== "classifier") {
+    floatingGrid.layout = "classifier";
+  } else {
+    floatingGrid.layout = "main";
+  }
+}
+
+/*
+  Function to open the world table
+*/
+function worldUpdate() {
+  if (!floatingGrid){
+    return;
+  }
+  floatingGrid.layout = "world";
+}
+
 
 /*
   Creating a simple scene with a camera and a renderer. 
@@ -306,54 +396,186 @@ fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
 
 BUI.Manager.init();
 
-const panel = BUI.Component.create<BUI.PanelSection>(() => {
-  return BUI.html`
-  <bim-panel active label="IFC Viewer" class="options-menu">
-    <bim-panel-section collapsed label="Controls">
-      <bim-panel-section style="padding-top: 12px;">
-        <bim-button label="Load IFC"
-          @click="${() => {
-            loadIfc();
-          }}">
-        </bim-button>  
-            
-        <bim-button label="Export fragments"
-          @click="${() => {
-            exportFragments();
-          }}">
-        </bim-button>  
-            
-        <bim-button label="Dispose fragments"
-          @click="${() => {
-            disposeFragments();
-          }}">
-        </bim-button>
-      
-      </bim-panel-section>
-      
-    </bim-panel>
+//Grid for the floating toolbar
+const floatingGrid = BUI.Component.create<BUI.Grid>( () => {
+  return BUI.html `
+      <bim-grid
+          floating
+          style="padding: 20px"
+      ></bim-grid>
   `;
 });
 
-document.body.append(panel);
+//Panel to display the properties of the elements we select or want to display properties
+const elementPropertyPanel = BUI.Component.create<BUI.Panel>( () => {
+  // Instanciating the actual properties to display in the table
+  const [propsTable, updatePropsTable] = CUI.tables.elementProperties({
+      components,
+      fragmentIdMap: {}
+  });
+  
+  
+  const highlighter = components.get(OBCF.Highlighter);
+  // highlighter emits an event every time an element is selected.
+  // so we can add our logic to it to display the properties of the selected element
+  // In this case we open the panel when an element is selected
+  highlighter.events.select.onHighlight.add((fragmentIdMap) => {
+      if (!floatingGrid){
+          return;
+      }
+      floatingGrid.layout = "secondary";	
+      //Updating fragmentIDMap and Table
+      updatePropsTable({fragmentIdMap});
+      propsTable.expanded = false;
+  });
 
-/* 
-  Logic that adds a button to the screen when the user is visiting the app from their phone.
-  Allowing to show or hide the menu. Otherwise, the menu would make the app unusable.
-*/
+  // In this case we close the panel when an element is deselected
+  highlighter.events.select.onClear.add((fragmentIdMap) => {
+      //Emptying the fragmentIDMap
+      updatePropsTable({fragmentIdMap: {}});
+      if (!floatingGrid){
+          return;
+      }
+      floatingGrid.layout = "main";	
+  })
 
-const button = BUI.Component.create<BUI.PanelSection>(() => {
-  return BUI.html`
-      <bim-button class="phone-menu-toggler" icon="solar:settings-bold"
-        @click="${() => {
-          if (panel.classList.contains("options-menu-visible")) {
-            panel.classList.remove("options-menu-visible");
-          } else {
-            panel.classList.add("options-menu-visible");
-          }
-        }}">
-      </bim-button>
-    `;
+  // Function for the search in the properties table
+  const search = (e: Event) => {
+      const input = e.target as BUI.TextInput;
+      propsTable.queryString = input.value;
+  }
+  
+  return BUI.html `
+      <bim-panel>
+          <bim-panel-section name="property" label="Property Information" icon="solar:document-bold" fixed>
+              <bim-text-input @input=${search} placeholder="Search..."></bim-text-input>
+              ${propsTable}
+          </bim-panel-section>
+      </bim-panel>
+  `;
 });
 
-document.body.append(button);
+// Panel for the classifier
+const classifierPanel = BUI.Component.create<BUI.Panel>( () => {
+  return BUI.html `
+      <bim-panel style="width: 400px;">
+          <bim-panel-section name="classifier" label="Classifier" icon="solar:document-bold" fixed>
+              <bim-label>Classifications</bim-label>
+              ${classificationsTree}
+          </bim-panel-section>
+      </bim-panel>
+  `;
+})
+
+// Panel to make changes in the world components (scene, camera, renderer, etc.)
+const worldPanel = BUI.Component.create<BUI.Panel>( () => {
+  const [worldsTable] = CUI.tables.worldsConfiguration({ components });
+
+  // Function for the search in the world table
+  const search = (e: Event) => {
+      const input = e.target as BUI.TextInput;
+      worldsTable.queryString = input.value;
+  }
+  
+  return BUI.html `
+      <bim-panel>
+          <bim-panel-section name="world" label="World Information" icon="solar:document-bold" fixed>
+              <bim-text-input @input=${search} placeholder="Search..."></bim-text-input>
+              ${worldsTable}
+          </bim-panel-section>
+      </bim-panel>
+  `;
+})
+
+//Floating toolbar
+const toolbar = BUI.Component.create<BUI.Toolbar>( () => {
+  const [loadIfcBtn] = CUI.buttons.loadIfc({components: components});
+  // For optimizing toolbar view we will use tool-tips instead of labels
+  // So when the user hover over the icons we see the tool-tip and so we get rid of the labels 
+  // Special case is the loadIfcBtn which is predefined by the OBC pacakage so to modify we do the following
+  loadIfcBtn.tooltipTitle = "Load IFC";
+  loadIfcBtn.label = "";
+
+  return BUI.html `
+    <bim-toolbar style="justify-self: center;">
+      <!-- World Update -->
+      <bim-toolbar-section label="App">
+        <bim-button tooltip-title="World" icon="tabler:brush" @click=${worldUpdate}></bim-button>
+      </bim-toolbar-section>
+      <!-- Importing IFC files -->
+      <bim-toolbar-section label="Import">
+        ${loadIfcBtn}
+      </bim-toolbar-section>
+      <!-- Fragments -->
+      <bim-toolbar-section label="Fragments">
+        <bim-button tooltip-title="Import" icon="mdi:cube" @click=${importFragments}></bim-button>
+        <bim-button tooltip-title="Export" icon="tabler:package-export" @click=${exportFragments}></bim-button>
+        <bim-button tooltip-title="Dispose" icon="tabler:trash" @click=${disposeFragments}></bim-button>
+        <!-- TO DO: there is to add two more buttons to export and import properties from IFC Files -->
+      </bim-toolbar-section>
+      <!-- Selection Buttons -->
+      <bim-toolbar-section label="Selection">
+        <bim-button tooltip-title="Visibility" icon="mdi:eye" @click=${toggleVisibility}></bim-button>
+        <bim-button tooltip-title="Isolate" icon="mdi:filter" @click=${isolateSelection}></bim-button>
+        <bim-button tooltip-title="Show all" icon="tabler:eye-filled" @click=${showAll}></bim-button>
+      </bim-toolbar-section>
+      <bim-toolbar-section label="Properties">
+        <bim-button tooltip-title="Show" icon="clarity:list-line" @click=${showProperties}></bim-button>
+      </bim-toolbar-section>
+    </bim-toolbar>
+  `;
+});
+
+//Layout for the toolbar
+floatingGrid.layouts = {
+  // Main layout
+  main: {
+      template: `
+          "empty" 1fr
+          "toolbar" auto
+          /1fr
+      `,
+      elements: {
+          toolbar
+      },
+  },
+  // Secondary layout that has the properties panel
+  secondary: {
+    template: `
+        "empty elementPropertyPanel" 1fr
+        "toolbar toolbar" auto
+        /1fr 20rem
+    `,
+    elements: {
+        toolbar,
+        elementPropertyPanel
+    },
+},
+// Layout that has the world panel
+world: {
+    template: `
+        "empty worldPanel" 1fr
+        "toolbar toolbar" auto
+        /1fr 20rem
+    `,
+    elements: {
+        toolbar,
+        worldPanel
+    },
+},
+  // Layout that has the classifier panel
+  classifier: {
+    template: `
+        "empty classifierPanel" 1fr
+        "toolbar toolbar" auto
+        /1fr 20rem
+    `,
+    elements: {
+        toolbar,
+        classifierPanel
+    },
+  },
+};
+floatingGrid.layout = "main";
+
+container.appendChild(floatingGrid);
