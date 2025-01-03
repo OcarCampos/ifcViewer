@@ -21,8 +21,10 @@
   },
   "dependencies": {
     "@thatopen/components": "^2.4.3",
+    "@thatopen/components-front": "^2.4.2",
     "@thatopen/fragments": "^2.4.0",
     "@thatopen/ui": "^2.4.1",
+    "@thatopen/ui-obc": "^2.4.1",
     "htmx.org": "^2.0.4",
     "three": "^0.160.1",
     "web-ifc": "^0.0.66"
