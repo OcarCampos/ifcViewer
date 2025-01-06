@@ -1,0 +1,236 @@
+:root {
+    --primary-color: #ffffff;
+    --secondary-color: #e0e0e0;
+    --accent-color: #4a9eff;
+    --background-color: #0a1921;
+    --dark-background: #061016;
+    --text-color: #ffffff;
+    --border-color: #1a2930;
+    --card-background: #0d202a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-image: linear-gradient(45deg, var(--dark-background) 0%, var(--background-color) 100%);
+    background-attachment: fixed;
+}
+
+.title {
+    padding: 2rem;
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin: 0;
+    background-color: transparent;
+    letter-spacing: 1px;
+    box-shadow: none;
+}
+
+#viewer-container {
+    width: 100%;
+    height: 60vh;
+    background-color: #1a1a1a;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Loading and Status Indicators */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.2rem;
+    z-index: 1000;
+}
+
+/* Info Section Styles */
+.info-section {
+    background-color: transparent;
+    padding: 4rem 0;
+    position: relative;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.info-section h2 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+.info-section h3 {
+    color: var(--secondary-color);
+    font-size: 1.5rem;
+    margin: 2.5rem 0 1.5rem;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+.info-section p {
+    color: var(--secondary-color);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.tool-item {
+    background-color: var(--card-background);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.tool-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.tool-item h4 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+.tool-item p {
+    color: var(--secondary-color);
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.tech-list {
+    list-style: none;
+    margin: 1.5rem 0;
+}
+
+.tech-list li {
+    margin: 1rem 0;
+    color: var(--secondary-color);
+    font-size: 1.1rem;
+}
+
+.tech-list strong {
+    color: var(--primary-color);
+    margin-right: 0.8rem;
+    font-weight: 500;
+}
+
+/* Footer Styles */
+.footer {
+    background-color: var(--dark-background);
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--secondary-color);
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-links {
+    margin-top: 0.8rem;
+}
+
+.footer-links a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.footer .separator {
+    margin: 0 1rem;
+    color: var(--border-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+        padding: 1.5rem;
+    }
+
+    #viewer-container {
+        height: 50vh;
+    }
+
+    .info-section {
+        padding: 3rem 0;
+    }
+
+    .info-section h2 {
+        font-size: 1.8rem;
+    }
+
+    .info-section h3 {
+        font-size: 1.4rem;
+    }
+
+    .tools-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .footer {
+        padding: 1.2rem;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dark-background);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--card-background);
+}

@@ -498,10 +498,6 @@ const toolbar = BUI.Component.create<BUI.Toolbar>( () => {
 
   return BUI.html `
     <bim-toolbar style="justify-self: center;">
-      <!-- World Update -->
-      <bim-toolbar-section label="App">
-        <bim-button tooltip-title="World" icon="tabler:brush" @click=${worldUpdate}></bim-button>
-      </bim-toolbar-section>
       <!-- Importing IFC files -->
       <bim-toolbar-section label="Import">
         ${loadIfcBtn}
@@ -519,8 +515,17 @@ const toolbar = BUI.Component.create<BUI.Toolbar>( () => {
         <bim-button tooltip-title="Isolate" icon="mdi:filter" @click=${isolateSelection}></bim-button>
         <bim-button tooltip-title="Show all" icon="tabler:eye-filled" @click=${showAll}></bim-button>
       </bim-toolbar-section>
+      <!-- Properties -->
       <bim-toolbar-section label="Properties">
         <bim-button tooltip-title="Show" icon="clarity:list-line" @click=${showProperties}></bim-button>
+      </bim-toolbar-section>
+      <!-- Groups -->
+      <bim-toolbar-section label="Groups">
+        <bim-button tooltip-title="Classifier" icon="tabler:eye-filled" @click=${classifier}></bim-button>
+      </bim-toolbar-section>
+      <!-- World Update -->
+      <bim-toolbar-section label="App">
+        <bim-button tooltip-title="World" icon="tabler:brush" @click=${worldUpdate}></bim-button>
       </bim-toolbar-section>
     </bim-toolbar>
   `;

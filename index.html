@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IFC 3D Model Viewer</title>
+    <title>IFC Model Viewer</title>
     <!-- Scripts -->
     <script type="module" src="/src/viewer/index.ts"></script>
     <link rel="stylesheet" href="/src/styles/main.css">
@@ -27,9 +27,53 @@
     </style>
 </head>
 <body>
-    <h1 class="title">IFC 3D Model Viewer</h1>
     <div id="viewer-container">
         <!-- The 3D viewer will be initialized here -->
+        <div class="loading-overlay" style="display: none;">
+            <span>Loading IFC Model...</span>
+        </div>
     </div>
+    <section class="info-section">
+        <div class="container">
+            <h2>Simple IFC Viewer</h2>
+            <p>IFC Viewer is a lightweight, web-based IFC 3D model viewer that allows you to view and interact with IFC (Industry Foundation Classes) models directly in your browser. Built with <a href="https://github.com/ThatOpen" target="_blank">That Open Engine</a> components, it provides an easy and seamless viewer for construction and BIM professionals.</p>
+            
+            <h3>Features & Tools</h3>
+            <div class="tools-grid">
+                <div class="tool-item">
+                    <h4>📥 Import</h4>
+                    <p>Import IFC files from your computer directly into the viewer. <br><br> The files arer processed by your computer and browser, so nothing gets uploaded to the server.</p>
+                </div>
+                <div class="tool-item">
+                    <h4>🧩 Fragments</h4>
+                    <p>Break down and manage model fragments for better performance. <br><br>Improve loading times by exporting your model into fragments that you can rerupload to the viewer when needed for further model inspection.</p>
+                </div>
+                <div class="tool-item">
+                    <h4>🔍 Selection</h4>
+                    <p>Select and isolate specific elements in the model so you can focus on them and review their properties.</p>
+                </div>
+                <div class="tool-item">
+                    <h4>📊 Properties</h4>
+                    <p>View detailed properties of selected elements in a tree style layout.</p>
+                </div>
+                <div class="tool-item">
+                    <h4>👥 Groups</h4>
+                    <p>Review element groups for better organization.</p>
+                </div>
+                <div class="tool-item">
+                    <h4>📱 App Settings</h4>
+                    <p>Configure viewer settings and customize how you see the viewer. <br><br> Change background color, grid visibility, and more.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <p> 2025 - IFC Viewer</p>
+        <div class="footer-links">
+            <a href="https://github.com/OcarCampos/ifcBrowser" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <span class="separator">|</span>
+            <a href="https://github.com/OcarCampos/ifcBrowser/issues" target="_blank" rel="noopener noreferrer">Report Issue</a>
+        </div>
+    </footer>
 </body>
 </html>
