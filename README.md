@@ -42,9 +42,11 @@ ifcBrowser/
 
 ## Development
 
-1. The main viewer implementation is in `src/viewer/index.ts`
-2. Add any additional styles in `src/styles/main.css`
-3. The viewer container is available with ID `viewer-container`
+1. Clone/fork the repository to your local machine.
+2. Install dependencies.
+3. Run the development server.
+4. Open the [index.html](index.html) file in your web browser.
+5. Start tweaking the viewer to your liking.
 
 ### Dependencies
 
