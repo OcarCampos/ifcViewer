@@ -1,12 +1,40 @@
-# IFC 3D Model Viewer
+# Simple IFC Viewer
 
-A web-based IFC model viewer built with TypeScript and [@thatopen/components](https://github.com/ThatOpen/engine_components) library. This viewer allows you to load, view, and interact with IFC (Industry Foundation Classes) models in a web browser.
+A lightweight, web-based IFC model viewer that allows you to view and interact with IFC (Industry Foundation Classes) models directly in your browser. Built with [@thatopen/components](https://github.com/ThatOpen/engine_components), it provides an easy and seamless viewer for construction and BIM professionals.
+
+## Features
+
+- **Import/Export**
+  - Load IFC files directly in your browser
+  - Import fragment files (.frag)
+  - Export fragment files for faster loading
+  - Dispose/reset scene memory
+
+- **Selection & Visibility**
+  - Select and highlight model elements
+  - Toggle element visibility
+  - Isolate selected elements
+  - Show/hide all elements
+
+- **Properties & Information**
+  - View detailed element properties
+  - Access model classification system
+  - Search and filter properties
+  - Real-time property updates
+
+- **Viewer Settings**
+  - Configure viewer appearance
+  - Adjust background color
+  - Toggle grid visibility
+  - Customize viewing experience
 
 ## Project Structure
 
 ```
 ifcBrowser/
 ├── index.html          # Main entry point
+├── vite.config.js      # Vite configuration
+├── tsconfig.json       # TypeScript configuration
 ├── src/
 │   ├── viewer/         # TypeScript files for the IFC viewer
 │   │   └── index.ts    # Main viewer implementation
@@ -14,42 +42,59 @@ ifcBrowser/
 │       └── main.css    # Main stylesheet
 ```
 
-## Usage
+## Getting Started
 
-1. Open the [index.html](index.html) file in your web browser.
-2. Click on the "Load IFC" button to load an IFC model.
-3. Interact with the model using the provided tools and features.
+### Prerequisites
+- Node.js (Latest LTS version recommended)
+- npm or yarn package manager
 
-### World Settings
-- Configure scene, camera, and renderer settings
+### Installation
 
-### Import/Export
-- Load IFC files
-- Import fragment files (.frag)
-- Export fragment files
-- Dispose/reset the scene
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/OcarCampos/ifcBrowser.git
+   cd ifcBrowser
+   ```
 
-### Selection Tools
-- Toggle element visibility
-- Isolate selected elements
-- Show all elements
-- View element properties
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### Properties and Classification
-- View detailed element properties
-- Access model classification system
-- Search and filter properties
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-## Development
+4. Open your browser and navigate to the local development server (usually http://localhost:5173)
 
-1. Clone/fork the repository to your local machine.
-2. Install dependencies.
-3. Run the development server.
-4. Open the [index.html](index.html) file in your web browser.
-5. Start tweaking the viewer to your liking.
+### Building for Production
 
-### Dependencies
+To create a production build:
+```bash
+npm run build
+```
 
-- [@thatopen/components](https://github.com/ThatOpen/engine_components) - Core BIM engine components
-- [@thatopen/ui](https://github.com/ThatOpen/engine_components) - UI components
-- [@thatopen/components-front](https://github.com/ThatOpen/engine_components) - Frontend components
+The built files will be in the `dist` directory.
+
+## Usage Guide
+
+Check out our [usage tutorial video](https://www.youtube.com/embed/pC96mbuW33A) for a detailed walkthrough of all features.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Contact
+
+- GitHub: [@OcarCampos](https://github.com/OcarCampos)
+- Email: [ocar.campos@attitude.cl](mailto:ocar.campos@attitude.cl)
+
+## License
+
+This project is licensed under the ISC License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Built with [That Open Engine](https://github.com/ThatOpen) components
+- Special thanks to the ThatOpenEngine community

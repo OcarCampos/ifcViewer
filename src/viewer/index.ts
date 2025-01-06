@@ -430,14 +430,14 @@ const elementPropertyPanel = BUI.Component.create<BUI.Panel>( () => {
   });
 
   // In this case we close the panel when an element is deselected
-  highlighter.events.select.onClear.add((fragmentIdMap) => {
+  highlighter.events.select.onClear.add(() => {
       //Emptying the fragmentIDMap
       updatePropsTable({fragmentIdMap: {}});
       if (!floatingGrid){
           return;
       }
       floatingGrid.layout = "main";	
-  })
+  });
 
   // Function for the search in the properties table
   const search = (e: Event) => {

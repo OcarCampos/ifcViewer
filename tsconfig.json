@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+      "module": "es2022",
+      "target": "es2022",
+      "lib": ["dom", "es2015", "es2016", "es2017"],
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "sourceMap": true,
+      "moduleResolution": "bundler",
+      "allowImportingTsExtensions": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true,
+      "jsx": "preserve"
+    },
+    "include": ["src/**/*"]
+}
