@@ -44,7 +44,7 @@ ifcBrowser/
 
 ## Getting Started
 
-### Using the builded version
+### Using the built version
 
 1. Download the files inside the `dist` folder.
 2. Paste the files into your server.
