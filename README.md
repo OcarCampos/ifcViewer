@@ -44,11 +44,20 @@ ifcBrowser/
 
 ## Getting Started
 
-### Prerequisites
+### Using the builded version
+
+1. Download the files inside the `dist` folder.
+2. Paste the files into your server.
+3. Open the `index.html` file in your browser.
+4. Click on the "Import IFC" button to load an IFC model.
+
+### Developing Locally
+
+#### Prerequisites
 - Node.js (Latest LTS version recommended)
 - npm or yarn package manager
 
-### Installation
+#### Installation
 
 1. Clone the repository:
    ```bash
@@ -68,7 +77,7 @@ ifcBrowser/
 
 4. Open your browser and navigate to the local development server (usually http://localhost:5173)
 
-### Building for Production
+#### Building for Production
 
 To create a production build:
 ```bash
@@ -79,7 +88,7 @@ The built files will be in the `dist` directory.
 
 ## Usage Guide
 
-Check out our [usage tutorial video](https://www.youtube.com/embed/pC96mbuW33A) for a detailed walkthrough of all features.
+Check out our [usage tutorial video](https://www.youtube.com/embed/pC96mbuW33A) for a walkthrough of all features.
 
 ## Contributing
 
