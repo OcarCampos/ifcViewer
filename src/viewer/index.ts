@@ -244,6 +244,8 @@ function worldUpdate() {
 */
 let fragmentModel: FragmentsGroup | undefined;
 const container = document.getElementById("viewer-container")!; //viewer container id in index.html
+const sidebar = document.getElementById("annotations-container")!; //sidebar for the annotations from the viewer
+const addAnnotationButton = document.getElementById("add-annotation-button")!;
 const components = new OBC.Components();
 const worlds = components.get(OBC.Worlds);
 
@@ -380,6 +382,7 @@ fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
 /*
   To get the resulted model every time a new model is loaded, 
   subscribe to the following event anywhere in your app:
+
 
 
  fragments.onFragmentsLoaded.add((model) => {
@@ -584,3 +587,22 @@ world: {
 floatingGrid.layout = "main";
 
 container.appendChild(floatingGrid);
+
+// Creating component to annotate in the viewer
+
+// Function that will have the logic to add annotations
+function addAnnotation() {
+  console.log("Adding annotation");
+}
+
+const annotator = BUI.Component.create<BUI.Button>( () => {
+  return BUI.html `
+      <bim-button
+          tooltip-title="Add"
+          icon="pajamas:file-addition"
+          @click=${() => addAnnotation()}
+      ></bim-button> 
+  `;
+}); 
+
+addAnnotationButton.append(annotator);

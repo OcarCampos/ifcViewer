@@ -5,32 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple IFC Viewer</title>
     <!-- Scripts -->
-    <script type="module" src="/src/viewer/index.ts"></script>
+    <script type="module" src="/src/Viewer/index.ts"></script>
     <link rel="stylesheet" href="/src/styles/main.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-        }
-        .title {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        #viewer-container {
-            width: 100%;
-            height: 80vh;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #f5f5f5;
-        }
-    </style>
 </head>
 <body>
-    <div id="viewer-container">
-        <!-- The 3D viewer will be initialized here -->
-        <div class="loading-overlay" style="display: none;">
-            <span>Loading IFC Model...</span>
+    <div class="main-container">
+        <div id="annotations-container" class="annotations-sidebar">
+            <div class="annotations-header">
+                <span class="annotations-title">Annotations</span>
+                <div id="add-annotation-button"></div>
+            </div>
+            <div class="search-container">
+                <span>🔍</span>
+                <input type="text" placeholder="Search annotations by name">
+            </div>
+        </div>
+        <div id="viewer-container">
+            <!-- The 3D viewer will be initialized here -->
         </div>
     </div>
     <section class="info-section">
@@ -67,9 +58,10 @@
                 </div>
             </div>
             <h3>Usage</h3>
+            <!--
             <div style="position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden;">
                 <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" width="420" height="345" src="https://www.youtube.com/embed/pC96mbuW33A" frameborder="0" allowfullscreen></iframe>
-            </div>
+            </div>  !-->
         </div>
     </section>
     <footer class="footer">
