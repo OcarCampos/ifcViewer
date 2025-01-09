@@ -12,6 +12,7 @@ import * as OBC from "@thatopen/components";
 import * as OBCF from "@thatopen/components-front";
 import * as CUI from "@thatopen/ui-obc";
 import { FragmentsGroup } from "@thatopen/fragments";
+import * as THREE from "three";
 
 /* 
   To save the fragments so that you don't need to open the IFC file 
@@ -610,14 +611,16 @@ const onRow = (event: CustomEvent) => {
 
   // Event listener to highlight and zoom to the IFC element related to the annotation
   row.addEventListener("click", () => {
-    const guids = JSON.parse(row.data.Guids); // Parsing back the guids to JSON
-    const fragmentIdMap = fragments.guidToFragmentIdMap(guids); // Using fragments to identify the IFC element
-    const highlighter = components.get(OBCF.Highlighter); // Calling the highlighter to highlight the IFC element
-    highlighter.highlightByID("select", fragmentIdMap); // Highlighting the IFC element
+    highlightAnnotation({
+      name: row.data.Name,
+      observation: row.data.Observation,
+      ifcGuids: JSON.parse(row.data.Guids),
+      camera: JSON.parse(row.data.Camera)
+    });
   });
 };
 
-// Creating the actual table
+// Creating the actual html for the table to store annotations
 const annotationsTable = BUI.Component.create<BUI.Table<TableData>>( () => {
   return BUI.html `
       <bim-table @rowcreated=${onRow}>
@@ -643,27 +646,85 @@ const annotationsContainer = document.getElementById("annotations-table")!;
 annotationsContainer.append(htmlTable);
 
 // Interface for annotation data
-interface AnnotationData {
+interface annotationData {
   name: string;
   observation: string;
   ifcGuids: string[];
+  camera: {position: THREE.Vector3, target: THREE.Vector3};
+}
+
+// Interface for annotation input data
+interface annotationInput {
+  name: string;
+  observation: string;
+}
+
+async function highlightAnnotation (annotation: annotationData) {
+  const fragments = components.get(OBC.FragmentsManager);
+  const fragmentIdMap = fragments.guidToFragmentIdMap(annotation.ifcGuids);
+  const highlighter = components.get(OBCF.Highlighter);
+  highlighter.highlightByID("select", fragmentIdMap, true, false);
+
+  if(!world){
+    throw new Error("World does not exist");
+  }
+
+  const camera = world.camera;
+  if(!camera.hasCameraControls()){
+    throw new Error("World camera does not have camera controls");
+  }
+
+  await camera.controls.setLookAt(
+    annotation.camera.position.x,
+    annotation.camera.position.y,
+    annotation.camera.position.z,
+    annotation.camera.target.x,
+    annotation.camera.target.y,
+    annotation.camera.target.z
+  )
 }
 
 // Function that will have the logic to add annotations
-function addAnnotation(data: AnnotationData) {
+function addAnnotation(data: annotationInput) {
   console.log("Adding annotation ", data);
+  const fragments = components.get(OBC.FragmentsManager);
+  const hightlighter = components.get(OBCF.Highlighter);
+  const guids = fragments.fragmentIdMapToGuids(hightlighter.selection.select);
+  const camera = world.camera;
+
+  if (!(camera.hasCameraControls())){
+    throw new Error("Camera has no camera controls");
+  }
+
+  const position = new THREE.Vector3();
+  camera.controls.getPosition(position);
+  const target = new THREE.Vector3();
+  camera.controls.getTarget(target);
+
+  const annotationData: annotationData = {
+    name: data.name,
+    observation: data.observation,
+    ifcGuids: guids,
+    camera: {
+      position,
+      target
+    },
+  };
+
+  const rowData = annotationData;
   // Creating a new row for the table with the annotation data
   const row: BUI.TableGroupData = {
     data: {
-      Name: data.name,
-      Observation: data.observation,
-      Guids: JSON.stringify(data.ifcGuids), // Converting the array to a JSON string so we can roll back if we need to
+      Name: rowData.name,
+      Observation: rowData.observation,
+      Guids: JSON.stringify(guids), // Converting the array to a JSON string so we can roll back if we need to
+      Camera: rowData.camera ? JSON.stringify(rowData.camera) : "",
     },
   };
   // Pushing the new row to the table
   annotationsTable.data = [...annotationsTable.data, row];
   // Hiding the Guids column from the html table
-  annotationsTable.hiddenColumns = ["Guids"];
+  annotationsTable.hiddenColumns = ["Guids", "Camera"];
 }
 
 // Annotation name and observation
@@ -685,14 +746,9 @@ const annotateModal = BUI.Component.create<HTMLDialogElement>( () => {
                 <bim-button
                   label="Create Annotation"
                   @click=${ () => {
-                      const fragments = components.get(OBC.FragmentsManager);
-                      const hightlighter = components.get(OBCF.Highlighter);
-                      const guids = fragments.fragmentIdMapToGuids(hightlighter.selection.select);
-
-                      const annotationValue = {
+                      const annotationValue: annotationInput = {
                         name: nameInput.value,
                         observation: observationInput.value,
-                        ifcGuids: guids,
                       };
                       addAnnotation(annotationValue);
                       nameInput.value = "";
