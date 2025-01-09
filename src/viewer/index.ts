@@ -244,8 +244,6 @@ function worldUpdate() {
 */
 let fragmentModel: FragmentsGroup | undefined;
 const container = document.getElementById("viewer-container")!; //viewer container id in index.html
-const sidebar = document.getElementById("annotations-container")!; //sidebar for the annotations from the viewer
-const addAnnotationButton = document.getElementById("add-annotation-button")!;
 const components = new OBC.Components();
 const worlds = components.get(OBC.Worlds);
 
@@ -266,13 +264,16 @@ world.scene = new OBC.SimpleScene(components);
 world.renderer = new OBCF.PostproductionRenderer(components, container);
 world.camera = new OBC.OrthoPerspectiveCamera(components);
 
+// Initializing the components
 components.init();
 
+// Setting up the scene
 world.renderer.postproduction.enabled = true;
 world.camera.controls.setLookAt(12, 6, 8, 0, 0, -10);
 world.camera.updateAspect();
 world.scene.setup();
 
+// Creating the grids
 const grids = components.get(OBC.Grids);
 grids.create(world);
 
@@ -360,7 +361,6 @@ container.addEventListener("resize", () => {
 */
 
 /*
-
 const excludedCats = [
   WEBIFC.IFCTENDONANCHOR,
   WEBIFC.IFCREINFORCINGBAR,
@@ -376,30 +376,25 @@ for (const cat of excludedCats) {
   Further configuring the conversion using the `webIfc` object. 
   Here we make the IFC model go to the origin of the scene (this supports model federation):
   */
-
 fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
 
 /*
   To get the resulted model every time a new model is loaded, 
   subscribe to the following event anywhere in your app:
 
-
-
  fragments.onFragmentsLoaded.add((model) => {
   console.log(model);
 });
-
 */
 
 /* 
   Using `@thatopen/ui` library to add some simple UI elements to the viewer app. 
-  
-  First, there is to call the `init` method of the `BUI.Manager` class to initialize the library:
+    First, there is to call the `init` method of the `BUI.Manager` class to initialize the library:
 */
 
 BUI.Manager.init();
 
-//Grid for the floating toolbar
+// Grid for the floating toolbar
 const floatingGrid = BUI.Component.create<BUI.Grid>( () => {
   return BUI.html `
       <bim-grid
@@ -409,14 +404,13 @@ const floatingGrid = BUI.Component.create<BUI.Grid>( () => {
   `;
 });
 
-//Panel to display the properties of the elements we select or want to display properties
+// Panel to display the properties of the elements we select or want to display properties
 const elementPropertyPanel = BUI.Component.create<BUI.Panel>( () => {
   // Instanciating the actual properties to display in the table
   const [propsTable, updatePropsTable] = CUI.tables.elementProperties({
       components,
       fragmentIdMap: {}
   });
-  
   
   const highlighter = components.get(OBCF.Highlighter);
   // highlighter emits an event every time an element is selected.
@@ -442,7 +436,7 @@ const elementPropertyPanel = BUI.Component.create<BUI.Panel>( () => {
       floatingGrid.layout = "main";	
   });
 
-  // Function for the search in the properties table
+  // For the search in the properties table
   const search = (e: Event) => {
       const input = e.target as BUI.TextInput;
       propsTable.queryString = input.value;
@@ -588,21 +582,148 @@ floatingGrid.layout = "main";
 
 container.appendChild(floatingGrid);
 
-// Creating component to annotate in the viewer
+/*
+* The following is extra code to add annotations on the side of the viewer in order to be able to make
+* annotations over the IFC models that are displayed in the viewer.
+*/
 
-// Function that will have the logic to add annotations
-function addAnnotation() {
-  console.log("Adding annotation");
+// Creating the table type that will store the annotations
+type TableData = {
+  Name: string;
+  Observation: string;
+  Guids: string;
+};
+
+// Event listener to point to the IFC element that the annotation relates to
+const onRow = (event: CustomEvent) => {
+  event.stopImmediatePropagation();
+  const { row } = event.detail;
+
+  // Add hover effect
+  row.addEventListener("mouseover", () => {
+    row.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+  });
+
+  row.addEventListener("mouseout", () => {
+    row.style.backgroundColor = "transparent";
+  });
+
+  // Event listener to highlight and zoom to the IFC element related to the annotation
+  row.addEventListener("click", () => {
+    const guids = JSON.parse(row.data.Guids); // Parsing back the guids to JSON
+    const fragmentIdMap = fragments.guidToFragmentIdMap(guids); // Using fragments to identify the IFC element
+    const highlighter = components.get(OBCF.Highlighter); // Calling the highlighter to highlight the IFC element
+    highlighter.highlightByID("select", fragmentIdMap); // Highlighting the IFC element
+  });
+};
+
+// Creating the actual table
+const annotationsTable = BUI.Component.create<BUI.Table<TableData>>( () => {
+  return BUI.html `
+      <bim-table @rowcreated=${onRow}>
+      </bim-table>
+  `;
+});
+
+// Creating and empty table to work on
+annotationsTable.data = [];
+
+// Creating the html table component
+const htmlTable = BUI.Component.create( () => 
+  BUI.html `
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; height: 100%;">
+      ${annotationsTable}
+      </div>
+  `,
+);
+
+// Getting the annotations container from index.html
+const annotationsContainer = document.getElementById("annotations-table")!;
+// Appendinig the html table to the container.
+annotationsContainer.append(htmlTable);
+
+// Interface for annotation data
+interface AnnotationData {
+  name: string;
+  observation: string;
+  ifcGuids: string[];
 }
 
+// Function that will have the logic to add annotations
+function addAnnotation(data: AnnotationData) {
+  console.log("Adding annotation ", data);
+  // Creating a new row for the table with the annotation data
+  const row: BUI.TableGroupData = {
+    data: {
+      Name: data.name,
+      Observation: data.observation,
+      Guids: JSON.stringify(data.ifcGuids), // Converting the array to a JSON string so we can roll back if we need to
+    },
+  };
+  // Pushing the new row to the table
+  annotationsTable.data = [...annotationsTable.data, row];
+  // Hiding the Guids column from the html table
+  annotationsTable.hiddenColumns = ["Guids"];
+}
+
+// Annotation name and observation
+const nameInput = document.createElement("bim-text-input");
+nameInput.label = "Name";
+const observationInput = document.createElement("bim-text-input");
+observationInput.label = "Observation";
+
+
+// Modal for the annotations
+const annotateModal = BUI.Component.create<HTMLDialogElement>( () => {
+  return BUI.html `
+      <dialog>
+          <bim-panel style="width: 20rem;">
+            <bim-panel-section name="annotate" label="Annotate" icon="solar:document-bold" fixed>
+                <bim-label>Create Annotation</bim-label>
+                ${nameInput}
+                ${observationInput}
+                <bim-button
+                  label="Create Annotation"
+                  @click=${ () => {
+                      const fragments = components.get(OBC.FragmentsManager);
+                      const hightlighter = components.get(OBCF.Highlighter);
+                      const guids = fragments.fragmentIdMapToGuids(hightlighter.selection.select);
+
+                      const annotationValue = {
+                        name: nameInput.value,
+                        observation: observationInput.value,
+                        ifcGuids: guids,
+                      };
+                      addAnnotation(annotationValue);
+                      nameInput.value = "";
+                      observationInput.value = "";
+                      annotateModal.close();
+                    }
+                  }
+                ></bim-button>
+            </bim-panel-section>
+          </bim-panel>
+      </dialog>
+  `;
+});
+
+// Appending the modal to the body of the page
+document.body.appendChild(annotateModal);
+
+// Actual button to add annotations
 const annotator = BUI.Component.create<BUI.Button>( () => {
   return BUI.html `
       <bim-button
           tooltip-title="Add"
           icon="pajamas:file-addition"
-          @click=${() => addAnnotation()}
+          @click=${() => {
+            annotateModal.showModal();
+          }}
       ></bim-button> 
   `;
 }); 
 
-addAnnotationButton.append(annotator);
+// Getting html element for the add annotation button
+const addAnnotationButton = document.getElementById("add-annotation-button")!;
+// Adding the annotation button to the sidebar
+ addAnnotationButton.append(annotator);

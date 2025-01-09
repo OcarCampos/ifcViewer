@@ -209,6 +209,31 @@ body {
     font-weight: 500;
 }
 
+/* Annotations Table Styles */
+.annotations-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    color: #fff;
+    background: transparent;
+}
+
+.annotations-table th,
+.annotations-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.annotations-table th {
+    font-weight: bold;
+    color: #ccc;
+}
+
+.annotations-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
 /* Footer Styles */
 .footer {
     background-color: var(--dark-background);
@@ -237,6 +262,24 @@ body {
 .footer .separator {
     margin: 0 1rem;
     color: var(--border-color);
+}
+
+/* Annotation Modal Styles */
+dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #fff;
+    box-shadow: none;
+}
+  
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 /* Responsive Design */
