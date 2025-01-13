@@ -333,3 +333,7 @@ dialog::backdrop {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--card-background);
 }
+
+bim-option {
+    padding: 4px;
+}

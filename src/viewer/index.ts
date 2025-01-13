@@ -19,7 +19,6 @@ import * as THREE from "three";
   each time. Instead, the next time you can load the fragments directly. 
   Defining a function to export and download fragments:
 */
-
 async function exportFragments() {
   // Get the fragments manager
   const fragmentsManager = components.get(OBC.FragmentsManager);
@@ -46,7 +45,6 @@ async function exportFragments() {
 /*
   Function to import fragments.
 */
-
 async function importFragments() {
   const input = document.createElement('input'); //create an input element
   input.type = 'file';  //set the type attribute to file
@@ -81,7 +79,6 @@ async function importFragments() {
   especially if you are using Single Page Application technologies like React, 
   Angular, Vue, etc. To do that, you can simply call the `dispose` method:
 */
-
 function disposeFragments() {
   const fragmentsManager = components.get(OBC.FragmentsManager);
   for (const [, group] of fragmentsManager.groups) {
@@ -95,7 +92,6 @@ function disposeFragments() {
   First index the relation entities of the model and then a classifier
   to group the elements based on level and entities.
 */
-
 async function processModel(model: FragmentsGroup) {
   const indexer = components.get(OBC.IfcRelationsIndexer);
   await indexer.process(model);
@@ -392,7 +388,6 @@ fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
   Using `@thatopen/ui` library to add some simple UI elements to the viewer app. 
     First, there is to call the `init` method of the `BUI.Manager` class to initialize the library:
 */
-
 BUI.Manager.init();
 
 // Grid for the floating toolbar
@@ -581,12 +576,16 @@ world: {
 };
 floatingGrid.layout = "main";
 
+// Appends the floating toolbar to the container
 container.appendChild(floatingGrid);
 
 /*
 * The following is extra code to add annotations on the side of the viewer in order to be able to make
 * annotations over the IFC models that are displayed in the viewer.
 */
+
+// List that will store all the annotation made by the user to be able to use them later. (save to file, etc)
+const annotations: annotationData[] = [];
 
 // Creating the table type that will store the annotations
 type TableData = {
@@ -614,6 +613,7 @@ const onRow = (event: CustomEvent) => {
     highlightAnnotation({
       name: row.data.Name,
       observation: row.data.Observation,
+      priority: row.data.Priority,
       ifcGuids: JSON.parse(row.data.Guids),
       camera: JSON.parse(row.data.Camera)
     });
@@ -645,24 +645,37 @@ const annotationsContainer = document.getElementById("annotations-table")!;
 // Appendinig the html table to the container.
 annotationsContainer.append(htmlTable);
 
-// Interface for annotation data
+
+// Type for the priority of the annotation.
+// Used in the interface for annotationInput
+type Priority = "Low" | "Medium" | "High";
+
+// Interface for annotation input data by the user
+interface annotationInput {
+  name: string;
+  observation: string;
+  priority: Priority;
+}
+
+// Interface for annotation data used internally
 interface annotationData {
   name: string;
   observation: string;
+  priority: Priority;
   ifcGuids: string[];
   camera: {position: THREE.Vector3, target: THREE.Vector3};
 }
 
-// Interface for annotation input data
-interface annotationInput {
-  name: string;
-  observation: string;
-}
+// Setting up highlighter colors for priorities
+highlighter.add("priority-Low", new THREE.Color(0x59bc59));
+highlighter.add("priority-Medium", new THREE.Color(0x597cff));
+highlighter.add("priority-High", new THREE.Color(0xff7676));
 
 async function highlightAnnotation (annotation: annotationData) {
   const fragments = components.get(OBC.FragmentsManager);
   const fragmentIdMap = fragments.guidToFragmentIdMap(annotation.ifcGuids);
   const highlighter = components.get(OBCF.Highlighter);
+
   highlighter.highlightByID("select", fragmentIdMap, true, false);
 
   if(!world){
@@ -704,6 +717,7 @@ function addAnnotation(data: annotationInput) {
   const annotationData: annotationData = {
     name: data.name,
     observation: data.observation,
+    priority: data.priority,
     ifcGuids: guids,
     camera: {
       position,
@@ -717,22 +731,35 @@ function addAnnotation(data: annotationInput) {
     data: {
       Name: rowData.name,
       Observation: rowData.observation,
+      Priority: rowData.priority,
       Guids: JSON.stringify(guids), // Converting the array to a JSON string so we can roll back if we need to
       Camera: rowData.camera ? JSON.stringify(rowData.camera) : "",
     },
   };
+  // Pushing data to the list of annotations
+  annotations.push(annotationData);
   // Pushing the new row to the table
   annotationsTable.data = [...annotationsTable.data, row];
   // Hiding the Guids column from the html table
   annotationsTable.hiddenColumns = ["Guids", "Camera"];
 }
 
-// Annotation name and observation
+// Annotation data we get from the user
 const nameInput = document.createElement("bim-text-input");
 nameInput.label = "Name";
 const observationInput = document.createElement("bim-text-input");
 observationInput.label = "Observation";
 
+// Dropdown menu for annotation's priority
+const priorityInput = BUI.Component.create<BUI.Dropdown>( () => {
+  return BUI.html `
+      <bim-dropdown label="Priority">
+          <bim-option label="Low"></bim-option>
+          <bim-option label="Medium"></bim-option>
+          <bim-option label="High"></bim-option>
+      </bim-dropdown>
+  `;
+});
 
 // Modal for the annotations
 const annotateModal = BUI.Component.create<HTMLDialogElement>( () => {
@@ -743,12 +770,14 @@ const annotateModal = BUI.Component.create<HTMLDialogElement>( () => {
                 <bim-label>Create Annotation</bim-label>
                 ${nameInput}
                 ${observationInput}
+                ${priorityInput}
                 <bim-button
                   label="Create Annotation"
                   @click=${ () => {
                       const annotationValue: annotationInput = {
                         name: nameInput.value,
                         observation: observationInput.value,
+                        priority: priorityInput.value[0] as Priority,
                       };
                       addAnnotation(annotationValue);
                       nameInput.value = "";
@@ -777,9 +806,44 @@ const annotator = BUI.Component.create<BUI.Button>( () => {
           }}
       ></bim-button> 
   `;
-}); 
+});
+
+// To enable or disable priority highlighting
+// we won't focus to the element in this function, just highlight according to priority color
+function enablePriorityHighlight (value: boolean) {
+  if (value) { 
+    for (const annotation of annotations) {
+      const fragmentIdMap = fragments.guidToFragmentIdMap(annotation.ifcGuids);
+      highlighter.highlightByID(`priority-${annotation.priority}`, fragmentIdMap, false, false);
+    }
+  } else {
+    // clears the highlighter if value false
+    highlighter.clear();
+  } 
+}
+
+// Function to toggle the annotation priority button state
+const onTogglePriority = (event: Event) => {
+  const btn = event.target as BUI.Button;
+  btn.active = !btn.active;
+  enablePriorityHighlight(btn.active);
+}
+
+// Button to manage the priorities
+const annotationPriorityButton = BUI.Component.create<BUI.Button>( () => {
+ return BUI.html `
+     <bim-button
+         icon="iconoir:fill-color"
+         tooltip-title="Priority Filter"
+         @click=${onTogglePriority}
+     ></bim-button> 
+ `;
+});
 
 // Getting html element for the add annotation button
 const addAnnotationButton = document.getElementById("add-annotation-button")!;
+// Adapting style to place the buttons side by side.
+addAnnotationButton.style.display = "flex";
+addAnnotationButton.style.gap = "8px";
 // Adding the annotation button to the sidebar
- addAnnotationButton.append(annotator);
+ addAnnotationButton.append(annotator, annotationPriorityButton);
