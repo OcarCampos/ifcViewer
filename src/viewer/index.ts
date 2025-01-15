@@ -594,6 +594,7 @@ container.appendChild(floatingGrid);
 
 // List that will store all the annotation made by the user to be able to use them later. (save to file, etc)
 const annotations: annotationData[] = [];
+let id_number = 0;  //Id that will be assigned to the new annotation, this is incremental no matter if the user deletes an annotation
 
 // Creating the table type that will store the annotations
 type TableData = {
@@ -641,6 +642,7 @@ const annotationsTable = BUI.Component.create<BUI.Table<TableData>>( () => {
 
 // Creating and empty table to work on
 annotationsTable.data = [];
+
 
 // Creating the html table component
 const htmlTable = BUI.Component.create( () => 
@@ -711,6 +713,8 @@ async function highlightAnnotation (annotation: annotationData) {
 
 // Function to edit an annotation
 function editAnnotation(id: number) {
+  console.log("Editing annotation with id:", id);
+  
   // Find the annotation in our array
   const annotation = annotations.find(a => a.id === id);
   if (!annotation) {
@@ -722,10 +726,13 @@ function editAnnotation(id: number) {
   console.log("Editing annotation:", annotation);
   // You can also highlight the element when editing
   highlightAnnotation(annotation);
+  
 }
 
 // Function to delete an annotation
 function deleteAnnotation(id: number) {
+  console.log("Deleting annotation with id:", id);
+  
   // Find the index in our annotations array
   const index = annotations.findIndex(a => a.id === id);
   if (index === -1) {
@@ -745,7 +752,30 @@ function deleteAnnotation(id: number) {
   }
 
   console.log("Deleted annotation with id:", id);
+  
 }
+
+// Generating buttons for the annotation table in the actions column.
+annotationsTable.dataTransform = {
+  Actions: (value: string, rowData: TableData) => {
+    return BUI.html `
+      <div style="display: flex; gap: 0.5rem;">
+        <bim-button	
+          icon="material-symbols:edit" 
+          style="background-color: yellow" 
+          tooltip-title="Edit"
+          @click=${ () => editAnnotation(rowData.Id) }>
+        </bim-button>
+        <bim-button	
+          icon="material-symbols:delete" 
+          style="background-color: red" 
+          tooltip-title="Delete"
+          @click=${ () => deleteAnnotation(rowData.Id) }>
+        </bim-button> 
+      </div>
+    `;
+  },
+};
 
 // Function that will have the logic to add annotations
 function addAnnotation(data: annotationInput) {
@@ -788,35 +818,11 @@ function addAnnotation(data: annotationInput) {
       Camera: rowData.camera ? JSON.stringify(rowData.camera) : "",
       Actions: "", // Dummy action column for adding buttons
     },
-  };
+  };  
   // Pushing data to the list of annotations
   annotations.push(annotationData);
   // Pushing the new row to the table
   annotationsTable.data = [...annotationsTable.data, row];
-  // converting the actions to buttons
-  annotationsTable.dataTransform = {
-    Actions: () => {
-      console.log(rowData);
-      console.log("ID:", rowData.id);
-
-      return BUI.html `
-        <div style="display: flex; gap: 0.5rem;">
-          <bim-button	
-            icon="material-symbols:edit" 
-            style="background-color: yellow" 
-            tooltip-title="Edit"
-            @click=${ () => editAnnotation(rowData.id) }>
-          </bim-button>
-          <bim-button	
-            icon="material-symbols:delete" 
-            style="background-color: red" 
-            tooltip-title="Delete"
-            @click=${ () => deleteAnnotation(rowData.id) }>
-          </bim-button> 
-        </div>
-      `;
-    },
-  };
   // Hiding the Guids column from the html table
   annotationsTable.hiddenColumns = ["Id", "Guids", "Camera"];
 }
@@ -852,7 +858,7 @@ const annotateModal = BUI.Component.create<HTMLDialogElement>( () => {
                   label="Create Annotation"
                   @click=${ () => {
                       const annotationValue: annotationInput = {
-                        id: annotations.length + 1,
+                        id: id_number + 1,
                         name: nameInput.value,
                         observation: observationInput.value,
                         priority: priorityInput.value[0] as Priority,
@@ -860,6 +866,7 @@ const annotateModal = BUI.Component.create<HTMLDialogElement>( () => {
                       addAnnotation(annotationValue);
                       nameInput.value = "";
                       observationInput.value = "";
+                      id_number += 1;
                       annotateModal.close();
                     }
                   }
