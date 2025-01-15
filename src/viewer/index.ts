@@ -762,14 +762,12 @@ annotationsTable.dataTransform = {
       <div style="display: flex; gap: 0.5rem;">
         <bim-button	
           icon="material-symbols:edit" 
-          style="background-color: yellow" 
-          tooltip-title="Edit"
+          style="background-color: blue" 
           @click=${ () => editAnnotation(rowData.Id) }>
         </bim-button>
         <bim-button	
           icon="material-symbols:delete" 
           style="background-color: red" 
-          tooltip-title="Delete"
           @click=${ () => deleteAnnotation(rowData.Id) }>
         </bim-button> 
       </div>
