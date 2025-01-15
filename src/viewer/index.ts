@@ -16,9 +16,13 @@ import * as THREE from "three";
 
 /* 
   To save the fragments so that you don't need to open the IFC file 
-  each time. Instead, the next time you can load the fragments directly. 
-  Defining a function to export and download fragments:
-*/
+  each time. Instead, the next time you can load the fragments directly, without needing 
+  the original IFC file. Fragments can load +10 times faster than IFC. 
+  
+  But fragments are not used outside ThatOpenCompany libraries. So to convert an IFC 
+  file to fragments:
+  */
+
 async function exportFragments() {
   // Get the fragments manager
   const fragmentsManager = components.get(OBC.FragmentsManager);
@@ -85,6 +89,10 @@ function disposeFragments() {
     fragmentsManager.disposeGroup(group);
   }
   fragmentModel = undefined;
+
+  // If we dispose the model, we will also 
+  // get rid of the annotations list associated
+  annotationsTable.data = [];
 }
 
 /*
@@ -589,9 +597,11 @@ const annotations: annotationData[] = [];
 
 // Creating the table type that will store the annotations
 type TableData = {
+  Id: number;
   Name: string;
   Observation: string;
   Guids: string;
+  Actions: string;
 };
 
 // Event listener to point to the IFC element that the annotation relates to
@@ -611,6 +621,7 @@ const onRow = (event: CustomEvent) => {
   // Event listener to highlight and zoom to the IFC element related to the annotation
   row.addEventListener("click", () => {
     highlightAnnotation({
+      id: row.data.id,
       name: row.data.Name,
       observation: row.data.Observation,
       priority: row.data.Priority,
@@ -645,13 +656,13 @@ const annotationsContainer = document.getElementById("annotations-table")!;
 // Appendinig the html table to the container.
 annotationsContainer.append(htmlTable);
 
-
 // Type for the priority of the annotation.
 // Used in the interface for annotationInput
 type Priority = "Low" | "Medium" | "High";
 
 // Interface for annotation input data by the user
 interface annotationInput {
+  id: number;
   name: string;
   observation: string;
   priority: Priority;
@@ -659,6 +670,7 @@ interface annotationInput {
 
 // Interface for annotation data used internally
 interface annotationData {
+  id: number;
   name: string;
   observation: string;
   priority: Priority;
@@ -697,9 +709,47 @@ async function highlightAnnotation (annotation: annotationData) {
   )
 }
 
+// Function to edit an annotation
+function editAnnotation(id: number) {
+  // Find the annotation in our array
+  const annotation = annotations.find(a => a.id === id);
+  if (!annotation) {
+    console.error("Annotation not found:", id);
+    return;
+  }
+  
+  // For now just log it, later you can add modal/form to edit
+  console.log("Editing annotation:", annotation);
+  // You can also highlight the element when editing
+  highlightAnnotation(annotation);
+}
+
+// Function to delete an annotation
+function deleteAnnotation(id: number) {
+  // Find the index in our annotations array
+  const index = annotations.findIndex(a => a.id === id);
+  if (index === -1) {
+    console.error("Annotation not found:", id);
+    return;
+  }
+
+  // Remove from annotations array
+  annotations.splice(index, 1);
+  
+  // Remove from table
+  const tableIndex = annotationsTable.data.findIndex(row => row.data.Id === id);
+  if (tableIndex !== -1) {
+    const newData = [...annotationsTable.data];
+    newData.splice(tableIndex, 1);
+    annotationsTable.data = newData;
+  }
+
+  console.log("Deleted annotation with id:", id);
+}
+
 // Function that will have the logic to add annotations
 function addAnnotation(data: annotationInput) {
-  console.log("Adding annotation ", data);
+  //console.log("Adding annotation ", data);
   const fragments = components.get(OBC.FragmentsManager);
   const hightlighter = components.get(OBCF.Highlighter);
   const guids = fragments.fragmentIdMapToGuids(hightlighter.selection.select);
@@ -715,6 +765,7 @@ function addAnnotation(data: annotationInput) {
   camera.controls.getTarget(target);
 
   const annotationData: annotationData = {
+    id: data.id,
     name: data.name,
     observation: data.observation,
     priority: data.priority,
@@ -729,19 +780,45 @@ function addAnnotation(data: annotationInput) {
   // Creating a new row for the table with the annotation data
   const row: BUI.TableGroupData = {
     data: {
+      Id: rowData.id,
       Name: rowData.name,
       Observation: rowData.observation,
       Priority: rowData.priority,
       Guids: JSON.stringify(guids), // Converting the array to a JSON string so we can roll back if we need to
       Camera: rowData.camera ? JSON.stringify(rowData.camera) : "",
+      Actions: "", // Dummy action column for adding buttons
     },
   };
   // Pushing data to the list of annotations
   annotations.push(annotationData);
   // Pushing the new row to the table
   annotationsTable.data = [...annotationsTable.data, row];
+  // converting the actions to buttons
+  annotationsTable.dataTransform = {
+    Actions: () => {
+      console.log(rowData);
+      console.log("ID:", rowData.id);
+
+      return BUI.html `
+        <div style="display: flex; gap: 0.5rem;">
+          <bim-button	
+            icon="material-symbols:edit" 
+            style="background-color: yellow" 
+            tooltip-title="Edit"
+            @click=${ () => editAnnotation(rowData.id) }>
+          </bim-button>
+          <bim-button	
+            icon="material-symbols:delete" 
+            style="background-color: red" 
+            tooltip-title="Delete"
+            @click=${ () => deleteAnnotation(rowData.id) }>
+          </bim-button> 
+        </div>
+      `;
+    },
+  };
   // Hiding the Guids column from the html table
-  annotationsTable.hiddenColumns = ["Guids", "Camera"];
+  annotationsTable.hiddenColumns = ["Id", "Guids", "Camera"];
 }
 
 // Annotation data we get from the user
@@ -775,6 +852,7 @@ const annotateModal = BUI.Component.create<HTMLDialogElement>( () => {
                   label="Create Annotation"
                   @click=${ () => {
                       const annotationValue: annotationInput = {
+                        id: annotations.length + 1,
                         name: nameInput.value,
                         observation: observationInput.value,
                         priority: priorityInput.value[0] as Priority,
