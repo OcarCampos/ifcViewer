@@ -603,6 +603,7 @@ type TableData = {
   Observation: string;
   Guids: string;
   Actions: string;
+  Priority: Priority;
 };
 
 // Event listener to point to the IFC element that the annotation relates to
@@ -726,6 +727,64 @@ function editAnnotation(id: number) {
   console.log("Editing annotation:", annotation);
   // You can also highlight the element when editing
   highlightAnnotation(annotation);
+
+  // Annotation data we get from the user
+  const nameEdit = document.createElement("bim-text-input");
+  nameEdit.label = "Name";
+  nameEdit.value = annotation.name;
+  const observationEdit = document.createElement("bim-text-input");
+  observationEdit.label = "Observation";
+  observationEdit.value = annotation.observation;
+
+  // Modal to edit annotations
+  const editModal = BUI.Component.create<HTMLDialogElement>( () => {
+    return BUI.html `
+        <dialog>
+            <bim-panel style="width: 20rem;">
+              <bim-panel-section name="edit" label="Edit" icon="solar:document-bold" fixed>
+                  <bim-label>Edit Annotation</bim-label>
+                  ${nameEdit}
+                  ${observationEdit}
+                  ${priorityInput}
+                  <bim-button
+                    label="Edit Annotation"
+                    @click=${ () => {
+                        const annotationValue: annotationData = {
+                          id: annotation.id,
+                          name: nameEdit.value,
+                          observation: observationEdit.value,
+                          priority: priorityInput.value[0] as Priority,
+                          ifcGuids: annotation.ifcGuids,
+                          camera: annotation.camera
+                        };
+                        // Update the annotation in our array
+                        const index = annotations.findIndex(a => a.id === id);
+                        if (index !== -1) {
+                          annotations[index] = annotationValue;
+                        }
+                        // Update the table
+                        const tableIndex = annotationsTable.data.findIndex(row => row.data.Id === id);
+                        if (tableIndex !== -1) {
+                          const newData = [...annotationsTable.data];
+                          newData[tableIndex].data.Name = nameEdit.value;
+                          newData[tableIndex].data.Observation = observationEdit.value;
+                          newData[tableIndex].data.Priority = priorityInput.value[0] as Priority;
+                          annotationsTable.data = newData;
+                        }
+                        editModal.close();
+                      }
+                    }
+                  ></bim-button>
+              </bim-panel-section>
+            </bim-panel>
+        </dialog>
+    `;
+  });
+
+  // Appending the modal to the body of the page
+  document.body.appendChild(editModal);
+  // Showing the modal
+  editModal.showModal();
   
 }
 
@@ -752,7 +811,6 @@ function deleteAnnotation(id: number) {
   }
 
   console.log("Deleted annotation with id:", id);
-  
 }
 
 // Generating buttons for the annotation table in the actions column.
@@ -842,7 +900,7 @@ const priorityInput = BUI.Component.create<BUI.Dropdown>( () => {
   `;
 });
 
-// Modal for the annotations
+// Modal to add annotations
 const annotateModal = BUI.Component.create<HTMLDialogElement>( () => {
   return BUI.html `
       <dialog>
