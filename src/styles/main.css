@@ -1,12 +1,17 @@
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 :root {
-    --primary-color: #ffffff;
-    --secondary-color: #e0e0e0;
-    --accent-color: #4a9eff;
-    --background-color: #0a1921;
-    --dark-background: #061016;
-    --text-color: #ffffff;
-    --border-color: #1a2930;
-    --card-background: #0d202a;
+    --primary-color: #FFFFFF;
+    --secondary-color: #34D399;
+    --accent-color: #34D399;
+    --background-color: #0A2F1F;
+    --dark-background: #102c34;
+    --light-background: #D1D5DB;
+    --text-color: #F3F4F6;
+    --border-color: rgba(52, 211, 153, 0.2);
+    --card-background: rgba(10, 31, 47, 0.8);
+    --nav-background: rgba(10, 31, 47, 0.8);
 }
 
 * {
@@ -17,8 +22,8 @@
 
 body {
     margin: 0;
-    padding: 20px;
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    padding: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
     min-height: 100vh;
@@ -28,41 +33,51 @@ body {
     background-attachment: fixed;
 }
 
+/* Typography */
+h1, h2, h3, h4, h5, h6, .title {
+    font-family: 'Inter', sans-serif;
+}
+
 .title {
     text-align: center;
     margin-bottom: 20px;
     padding: 2rem;
     color: var(--primary-color);
     font-size: 2.5rem;
-    font-weight: 300;
-    letter-spacing: 1px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
     box-shadow: none;
 }
 
 .main-container {
     display: flex;
-    gap: 20px;
-    height: 60vh;
+    gap: 10px;
+    height: 70vh;
+    background-color: var(--dark-background);
+    flex-direction: row;
 }
 
 #viewer-container {
     flex: 1;
-    background-color: #1e1e1e;
+    background-color: var(--light-background);
     position: relative;
     border: 1px solid #ccc;
     border-radius: 4px;
     width: 100%;
-    height: 60vh;
+    height: 70vh;
     overflow: hidden;
 }
 
 .annotations-sidebar {
-    width: 300px;
-    background-color: #1e1e1e;
+    width: 400px;
+    background-color: var(--dark-background);
+    border: 1px solid #ccc;
     color: white;
-    padding: 16px;
+    padding: 8px;
     border-radius: 4px;
-    height: fit-content;
+    height: 100%;
+    overflow-y: auto;
+    transition: all 0.3s ease;
 }
 
 .annotations-header {
@@ -120,10 +135,22 @@ body {
     z-index: 1000;
 }
 
-/* Info Section Styles */
-.info-section {
-    background-color: transparent;
-    padding: 4rem 0;
+/* Section Styles */
+.hero-section {
+    background-color: var(--dark-background);
+    padding: 2rem 0;
+    position: relative;
+}
+
+.features-section {
+    background-color: var(--light-background);
+    padding: 3rem 0;
+    position: relative;
+}
+
+.usage-section {
+    background-color: var(--dark-background);
+    padding: 3rem 0;
     position: relative;
 }
 
@@ -133,20 +160,25 @@ body {
     padding: 0 1.5rem;
 }
 
+/* Info Section Styles */
+.info-section {
+    display: none;
+}
+
 .info-section h2 {
     color: var(--primary-color);
     font-size: 2rem;
     margin-bottom: 1.5rem;
-    font-weight: 300;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
 }
 
 .info-section h3 {
     color: var(--secondary-color);
     font-size: 1.5rem;
     margin: 2.5rem 0 1.5rem;
-    font-weight: 300;
-    letter-spacing: 0.5px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
 }
 
 .info-section p {
@@ -181,12 +213,12 @@ body {
     color: var(--primary-color);
     font-size: 1.2rem;
     margin-bottom: 1rem;
-    font-weight: 400;
-    letter-spacing: 0.5px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
 }
 
 .tool-item p {
-    color: var(--secondary-color);
+    color: var(--text-color);
     font-size: 1rem;
     margin: 0;
     line-height: 1.6;
@@ -207,6 +239,41 @@ body {
     color: var(--primary-color);
     margin-right: 0.8rem;
     font-weight: 500;
+}
+
+.hero-section h2 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+}
+
+.hero-section p {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    width: 100%;
+    text-align: justify;
+}
+
+.features-section h3 {
+    color: var(--background-color);
+    font-size: 2.5rem;
+    margin-bottom: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    text-align: left;
+}
+
+.usage-section h3 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    text-align: left;
 }
 
 /* Annotations Table Styles */
@@ -236,63 +303,107 @@ body {
 
 /* Footer Styles */
 .footer {
-    background-color: var(--dark-background);
-    padding: 1.5rem;
-    text-align: center;
-    color: var(--secondary-color);
-    border-top: 1px solid var(--border-color);
+    background-color: var(--light-background);
+    border-top: 1px solid rgba(52, 211, 153, 0.2);
+    padding: 3rem 0;
 }
 
-.footer-links {
-    margin-top: 0.8rem;
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
-.footer-links a {
-    color: var(--accent-color);
+.footer-section {
+    padding: 0 1rem;
+}
+
+.footer-title {
+    color: var(--background-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: -0.025em;
+}
+
+.footer-subtitle {
+    color: var(--background-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.footer-description {
+    color: var(--background-color);
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+.footer-links,
+.footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    space-between: 0.5rem;
+}
+
+.footer-links li,
+.footer-contact li {
+    margin-bottom: 0.5rem;
+    color: var(--background-color);
+}
+
+.footer-links a,
+.footer-contact a {
+    color: var(--background-color);
     text-decoration: none;
     transition: color 0.2s ease;
-    font-size: 0.95rem;
 }
 
 .footer-links a:hover {
-    color: var(--primary-color);
-    text-decoration: none;
+    color: var(--accent-color);
 }
 
-.footer .separator {
-    margin: 0 1rem;
-    color: var(--border-color);
+.footer-bottom {
+    padding-top: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(10, 47, 31, 0.2);
+    text-align: center;
 }
 
-/* Annotation Modal Styles */
-dialog {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: #fff;
-    box-shadow: none;
-}
-  
-dialog::backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
+.footer-bottom p {
+    color: var(--background-color);
+    opacity: 0.8;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     .title {
         font-size: 2rem;
         padding: 1.5rem;
     }
 
+    .main-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .annotations-sidebar {
+        width: 100%;
+        height: 300px;
+    }
+
     #viewer-container {
         height: 50vh;
     }
+}
 
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .annotations-sidebar {
+        width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
     .info-section {
         padding: 3rem 0;
     }
@@ -312,6 +423,15 @@ dialog::backdrop {
 
     .footer {
         padding: 1.2rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .footer-section {
+        padding: 0;
     }
 }
 

@@ -739,7 +739,7 @@ function editAnnotation(id: number) {
   // Modal to edit annotations
   const editModal = BUI.Component.create<HTMLDialogElement>( () => {
     return BUI.html `
-        <dialog>
+        <dialog style="position: fixed; top: 20%; left: 20%; transform: translate(-50%, -50%); margin: 0; background: transparent; border: none;">
             <bim-panel style="width: 20rem;">
               <bim-panel-section name="edit" label="Edit" icon="solar:document-bold" fixed>
                   <bim-label>Edit Annotation</bim-label>
@@ -903,7 +903,7 @@ const priorityInput = BUI.Component.create<BUI.Dropdown>( () => {
 // Modal to add annotations
 const annotateModal = BUI.Component.create<HTMLDialogElement>( () => {
   return BUI.html `
-      <dialog>
+      <dialog style="position: fixed; top: 20%; left: 20%; transform: translate(-50%, -50%); margin: 0; background: transparent; border: none;">
           <bim-panel style="width: 20rem;">
             <bim-panel-section name="annotate" label="Annotate" icon="solar:document-bold" fixed>
                 <bim-label>Create Annotation</bim-label>

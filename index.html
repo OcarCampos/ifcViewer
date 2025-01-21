@@ -10,16 +10,16 @@
 </head>
 <body>
     <div class="main-container">
-        <div id="annotations-container" class="annotations-sidebar">
+        <div id="annotations-container" class="annotations-sidebar" style="height: 100%">
             <div class="annotations-header">
-                <span class="annotations-title">Annotations</span>
+                <span class="annotations-title">Anotaciones</span>
                 <div id="add-annotation-button"></div>
             </div>
             <div class="search-container">
-                <span>🔍</span>
-                <input type="text" placeholder="Search annotations by name">
+                <span> </span>
+                <input type="text" placeholder="Buscar por nombre">
             </div>
-            <div id="annotations-table">
+            <div id="annotations-table" style="height: calc(100% - 10rem)">
                 <!-- Annotations will be added here -->
             </div>
         </div>
@@ -27,54 +27,104 @@
             <!-- The 3D viewer will be initialized here -->
         </div>
     </div>
-    <section class="info-section">
+    <!-- Hero Section -->
+    <section class="hero-section">
         <div class="container">
             <h2>Simple IFC Viewer</h2>
-            <p>Simple IFC Viewer is a lightweight, web-based IFC 3D model viewer that allows you to view and interact with IFC (Industry Foundation Classes) models 
-                directly in your browser. Built with <a href="https://github.com/ThatOpen" target="_blank">That Open Engine</a> components, 
-                it provides an easy and seamless on the go viewer for construction and BIM professionals.</p>            
-            <h3>Features</h3>
+            <p style="flex: 1;">Simple IFC Viewer es un visor 3D web para modelos IFC. Permrite visualizar e interactuar con modelos
+                IFC directamente desde el navegador sin la necesidad de instalar aplicaciones en el equipo.<br><br>
+                Desarrollado por OnBIM y con componentes de <a href="https://github.com/ThatOpen" target="_blank">That 
+                Open Engine</a>, lo hacen un visor sencillo y fluido para todo tipo de especialistas.
+            </p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <h3>Funciones</h3>
             <div class="tools-grid">
                 <div class="tool-item">
-                    <h4>📥 Import</h4>
-                    <p>Import IFC files from your computer directly into the viewer. <br><br> The files arer processed by your computer and browser, so nothing gets uploaded to the server.</p>
+                    <h4>📥 Importar</h4>
+                    <p>
+                        Importa archivos IFC desde tu computador directo al visor. <br><br> 
+                        Los archivos son procesados por tu computador y tu navegador. <br><br>
+                        Nada queda en el servidor de OnBIM.
+                    </p>
                 </div>
                 <div class="tool-item">
-                    <h4>🧩 Fragments</h4>
-                    <p>Break down and manage model fragments for better performance. <br><br>Improve loading times by exporting your model into fragments that you can rerupload to the viewer when needed for further model inspection.</p>
+                    <h4>🧩 Fragmentos</h4>
+                    <p>
+                        El visualizador procesa el modelo en fragmentos para mejorar la velocidad de carga. <br><br>
+                        Exporta tu modelo como fragmentos para que cada vez que quieras volver a revisarlo, la velocidad
+                        de carga del modelo sea aún mayor.
+                    </p>
                 </div>
                 <div class="tool-item">
-                    <h4>🔍 Selection</h4>
-                    <p>Select and isolate specific elements in the model so you can focus on them and review their properties.</p>
+                    <h4>🔍 Seleccióna y anota</h4>
+                    <p>
+                        Selecciona y aisla elementos específicos en el modelo para enfocarte en ellos y revisar sus propiedades.<br><br>
+                    Además, puedes generar anotaciones desde la barra lateral para así compartir tús observaciones con otros profesionales.
+                    </p>
                 </div>
                 <div class="tool-item">
-                    <h4>📊 Properties</h4>
-                    <p>View detailed properties of selected elements in a tree style layout.</p>
+                    <h4>📊 Propiedades</h4>
+                    <p>
+                        Revisa las propiedades IFC de cada elemento geométrico del modelo con la tabla lateral de propiedades.
+                    </p>
                 </div>
                 <div class="tool-item">
-                    <h4>👥 Groups</h4>
-                    <p>Review element groups for better organization.</p>
+                    <h4>👥 Grupos</h4>
+                    <p>
+                        Revisa los elementos de grupos y sus propiedades.
+                    </p>
                 </div>
                 <div class="tool-item">
-                    <h4>📱 App Settings</h4>
-                    <p>Configure viewer settings and customize how you see the viewer. <br><br> Change background color, grid visibility, and more.</p>
+                    <h4>📱 Ajustes de Visor</h4>
+                    <p>
+                        Configura los ajustes del visor y personaliza como ves el mundo virtual de revisión. <br><br> 
+                        Cambia el color de fondo, visibilidad de la grilla y más.
+                    </p>
                 </div>
             </div>
-            <h3>Usage</h3>
-            <!--
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="usage-section">
+        <div class="container">
+            <h3>Demo</h3>
             <div style="position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden;">
                 <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" width="420" height="345" src="https://www.youtube.com/embed/pC96mbuW33A" frameborder="0" allowfullscreen></iframe>
-            </div>  !-->
+            </div>
         </div>
     </section>
     <footer class="footer">
-        <p> 2025 - IFC Viewer - O'car Campos</p>
-        <div class="footer-links">
-            <a href="https://github.com/OcarCampos/ifcViewer" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <span class="separator">|</span>
-            <a href="https://github.com/OcarCampos/ifcViewer/issues" target="_blank" rel="noopener noreferrer">Report Issue</a>
-            <span class="separator">|</span>
-            <a href="mailto:ocar.campos@attitude.cl" target="_blank" rel="noopener noreferrer">Contact</a>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3 class="footer-title">OnBIM</h3>
+                    <p class="footer-description">Simple IFC Viewer fue desarrollado por OnBIM.</p>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-subtitle">Enlaces</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://onbim.cl" target="_blank" rel="noopener noreferrer">OnBIM</a></li>
+                        <li><a href="https://github.com/OcarCampos/ifcViewer" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="https://github.com/OcarCampos/ifcViewer/issues" target="_blank" rel="noopener noreferrer">Report Issue</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-subtitle">Contacto</h4>
+                    <ul class="footer-contact">
+                        <li><a href="mailto:contacto@onbim.cl">contacto@onbim.cl</a></li>
+                        <li>Chile</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 OnBIM. Todos los derechos reservados.</p>
+            </div>
         </div>
     </footer>
 </body>

@@ -107,3 +107,44 @@ This project is licensed under the ISC License - see the LICENSE file for detail
 
 - Built with [That Open Engine](https://github.com/ThatOpen) components
 - Special thanks to the ThatOpenEngine community
+
+# Frontend Style Guide
+
+## Main Colors
+* Deep Forest Green: #0A2F1F - Used as the main background color* Mint Green: #34D399 - Used as accent color for hover states and borders 
+* White: #FFFFFF - Used for text and contrast elements
+* Dark Blue-Green: #0A1F2F (with 80% opacity) - Used in the navigation bar 5. 
+* Darker Teal: #102c34 - Used as background for some sections 
+* Gray from tailwind:bg-gray-300 - Used for some section backgrounds
+
+## Color Usage:
+
+* Primary Background: Deep Forest Green (#0A2F1F)
+* Navigation Bar: Dark Blue-Green (#0A1F2F with 80% opacity and blur effect)
+* Accent/Interactive Elements: Mint Green (#34D399)
+* Text: White (#FFFFFF) for main content, with hover states changing to Mint Green
+* Section Backgrounds: Alternating between Gray (bg-gray-300) and Darker Teal (#102c34)
+* Borders: Mint Green with 20% opacity (#34D399/20)
+
+## Animations
+* Subtle hover effects, smooth scroll transitions
+
+## Layout
+* Clean grid system with ample white space, improved glass effects and sophisticated borders. 
+* Enhanced visual hierarchy with careful use of opacity and blur effects.
+* Consistent spacing and padding across sections.
+
+## Typography
+
+* Modern Sans-serif (Inter) for headings.
+* System fonts for body text.
+* Headings use weights 500-600
+* Negative letter-spacing (-0.025em) for headings
+
+### Size hierarchy:
+
+* Title: 2.5rem with 600 weight
+* H2: 2rem with 600 weight
+* H3: 1.5rem with 500 weight
+* H4: 1.2rem with 500 weight
+
